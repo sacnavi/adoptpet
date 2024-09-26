@@ -1,0 +1,609 @@
+{
+	"openapi": "3.0.1",
+	"info": {
+		"title": "Proyecto Final - Avance Módulo 1 - API",
+		"description": "Definición de endpoints para microservicio Mascotas de AdoptPet",
+		"contact": {
+			"name": "Iván Castillo",
+			"url": "https://www.linkedin.com/in/sacnavi",
+			"email": "sacnavi@outlook.com"
+		},
+		"version": "v1"
+	},
+	"servers": [
+		{
+			"url": "http://localhost:8080",
+			"description": "Generated server url"
+		}
+	],
+	"tags": [
+		{
+			"name": "ciudad",
+			"description": "API de administración de ciudades"
+		},
+		{
+			"name": "mascota",
+			"description": "API de administración de mascotas"
+		}
+	],
+	"paths": {
+		"/api/mascotas/{id}": {
+			"get": {
+				"tags": [
+					"mascota"
+				],
+				"summary": "Consulta mascota por Id",
+				"operationId": "getPetById",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"404": {
+						"description": "Mascota no encontrada",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Pet"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Pet"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"tags": [
+					"mascota"
+				],
+				"summary": "Modificar mascota por Id",
+				"operationId": "updatePet",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Pet"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"404": {
+						"description": "Mascota inexistente",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Pet"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Pet"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"mascota"
+				],
+				"summary": "Borrar mascota por Id",
+				"operationId": "deletePet",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					}
+				}
+			}
+		},
+		"/api/mascotas/{id}/vaccine": {
+			"put": {
+				"tags": [
+					"mascota"
+				],
+				"summary": "Agregar vacuna a una mascota",
+				"operationId": "addPetVaccine",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Vaccine"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"404": {
+						"description": "Mascota inexistente",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Pet"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Pet"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/mascotas/{id}/photo": {
+			"put": {
+				"tags": [
+					"mascota"
+				],
+				"summary": "Agregar foto a una mascota",
+				"operationId": "addPetPhoto",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"type": "string"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"404": {
+						"description": "Mascota inexistente",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Pet"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Pet"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/ciudades/{id}": {
+			"get": {
+				"tags": [
+					"ciudad"
+				],
+				"summary": "Consulta ciudad por Id",
+				"operationId": "getCityById",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/City"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Ciudad no encontrada",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/City"
+								}
+							}
+						}
+					}
+				}
+			},
+			"put": {
+				"tags": [
+					"ciudad"
+				],
+				"summary": "Modificar ciudad por Id",
+				"operationId": "updateCity",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/City"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"404": {
+						"description": "Ciudad inexistente",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/City"
+								}
+							}
+						}
+					},
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/City"
+								}
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"tags": [
+					"ciudad"
+				],
+				"summary": "Borrar ciudad por Id",
+				"operationId": "deleteCity",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"204": {
+						"description": "No Content"
+					}
+				}
+			}
+		},
+		"/api/mascotas": {
+			"get": {
+				"tags": [
+					"mascota"
+				],
+				"summary": "Listar todas las mascotas",
+				"operationId": "listPets",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/Pet"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"mascota"
+				],
+				"summary": "Crear mascota",
+				"operationId": "addPet",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NewPetRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Pet"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/ciudades": {
+			"get": {
+				"tags": [
+					"ciudad"
+				],
+				"summary": "Listar todas las ciudades",
+				"operationId": "listCities",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": {
+										"$ref": "#/components/schemas/City"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": [
+					"ciudad"
+				],
+				"summary": "Crear ciudad",
+				"operationId": "addCity",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/City"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"201": {
+						"description": "Created",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/City"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"Location": {
+				"type": "object",
+				"properties": {
+					"cityName": {
+						"type": "string"
+					},
+					"zip": {
+						"type": "string"
+					},
+					"comments": {
+						"type": "string"
+					}
+				}
+			},
+			"Pet": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"species": {
+						"type": "string"
+					},
+					"breed": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"comments": {
+						"type": "string"
+					},
+					"spayed": {
+						"type": "boolean"
+					},
+					"age": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"foundIn": {
+						"$ref": "#/components/schemas/Location"
+					},
+					"sex": {
+						"type": "string",
+						"enum": [
+							"MALE",
+							"FEMALE"
+						]
+					},
+					"registerStatus": {
+						"type": "string",
+						"enum": [
+							"ARRIVED",
+							"CHECKED",
+							"READY",
+							"PROCESSING",
+							"ADOPTED"
+						]
+					},
+					"vaccines": {
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/Vaccine"
+						}
+					},
+					"photos": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"Vaccine": {
+				"type": "object",
+				"properties": {
+					"type": {
+						"type": "string"
+					},
+					"lot": {
+						"type": "string"
+					},
+					"applicationDate": {
+						"type": "string",
+						"format": "date"
+					}
+				}
+			},
+			"City": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"code": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"zips": {
+						"type": "array",
+						"items": {
+							"type": "string"
+						}
+					}
+				}
+			},
+			"NewPetRequest": {
+				"type": "object",
+				"properties": {
+					"species": {
+						"type": "string"
+					},
+					"breed": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"comments": {
+						"type": "string"
+					},
+					"spayed": {
+						"type": "boolean"
+					},
+					"age": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"sex": {
+						"type": "string",
+						"enum": [
+							"MALE",
+							"FEMALE"
+						]
+					},
+					"foundIn": {
+						"$ref": "#/components/schemas/Location"
+					}
+				}
+			}
+		}
+	}
+}
