@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: adoptpet
+  data:
+    mongodb:
+      uri: ${APP_DB_URL}
+      database: ${APP_DB}
+      username: ${APP_USR}
+      password: ${APP_PASS}
+
+server:
+  port: 8079
