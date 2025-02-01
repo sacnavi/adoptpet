@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adoptpet-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adoptpet-svc
+  template:
+    metadata:
+      labels:
+        app: adoptpet-svc
+    spec:
+      containers:
+        - name: adoptpet-svc
+          image: sacnavi/adoptpetsvc:v5
+          ports:
+            - containerPort: 8079
+          env:
+            - name: APP_DB_URL
+              value: mongodb+srv://adoptpet:rqIYZp0tmt75UaPH@cluster0.brcnj.mongodb.net/adoptpetdb
