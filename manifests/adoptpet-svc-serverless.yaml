@@ -1,20 +1,12 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: serving.knative.dev/v1
+kind: Service
 metadata:
-  name: adoptpet-svc
+  name: adoptpet-svc-serverless
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: adoptpet-svc
   template:
-    metadata:
-      labels:
-        app: adoptpet-svc
     spec:
       containers:
-        - name: adoptpet-svc
-          image: sacnavi/adoptpetsvc:v5
+        - image: sacnavi/adoptpetsvc:v5
           ports:
             - containerPort: 8079
           env:

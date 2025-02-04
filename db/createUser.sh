@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+mongosh admin --host localhost -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --eval "db.getSiblingDB('admin').createUser({user: '${APP_USER}', pwd: '${APP_PASS}', roles: [{ role: 'readWrite', db: '${APP_DB}' }]})"

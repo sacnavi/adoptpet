@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: adoptpet-svc
+  name: adoptpet-db
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: adoptpet-svc
+      app: adoptpet-db
   template:
     metadata:
       labels:
-        app: adoptpet-svc
+        app: adoptpet-db
     spec:
       containers:
-        - name: adoptpet-svc
-          image: sacnavi/adoptpetsvc:v5
+        - name: adoptpet-db
+          image: sacnavi/adoptpetdb:v1
           ports:
-            - containerPort: 8079
+            - containerPort: 27017
           env:
             - name: APP_DB
               valueFrom:
@@ -33,5 +33,10 @@ spec:
                  secretKeyRef:
                    name: adoptpet-secrets
                    key: dbpassword
-            - name: APP_DB_URL
-              value: mongodb://${APP_USER}:${APP_PASS}@adoptpet-db:27017/{APP_DB}?authSource=admin
+          volumeMounts:
+            - name: adoptpet-db-storage
+              mountPath: /data/db
+      volumes:
+        - name: adoptpet-db-storage
+          persistentVolumeClaim:
+            claimName: adoptpet-db-pvc

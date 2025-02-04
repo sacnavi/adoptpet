@@ -1,0 +1,16 @@
+db.cities.insertOne({_id:'7a2c89f0-ee94-4d8f-bf3b-315e76014d11', code:'09010',name:'Álvaro Obregón', zips:['01000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'98dff2b2-c582-4af7-9e75-c194eb0558e4', code:'09002',name:'Azcapotzalco', zips:['02000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'a78cd86f-8885-428c-acb8-791551d2a3aa', code:'09014',name:'Benito Juárez', zips:['03000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'13e7c713-4dce-44c2-82e5-25c0777ff78a', code:'09003',name:'Coyoacán', zips:['04000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'3e7d40ee-e9f7-42ca-ac18-3c699329892c', code:'09004',name:'Cuajimalpa de Morelos', zips:['05000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'b96682f2-c201-46ae-9f55-827e72cb2498', code:'09015',name:'Cuauhtémoc', zips:['06000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'a2e306b8-b150-4106-8928-2caea75ef425', code:'09005',name:'Gustavo A. Madero', zips:['07000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'c2ccd50b-ae17-4aca-bdf4-faaf6684d4d9', code:'09006',name:'Iztacalco', zips:['08000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'8fd94450-28a0-4e8e-a19f-296df118e81b', code:'09007',name:'Iztapalapa', zips:['09000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'95eb9576-ffd8-434c-ac63-eeb4d9a3f60d', code:'09008',name:'La Magdalena Contreras', zips:['10000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'5de142fd-43d6-4daa-8a67-da309930e8b4', code:'09016',name:'Miguel Hidalgo', zips:['11000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'1a9d5f9a-3bdc-4902-8d9e-f248e7f2ae22', code:'09009',name:'Milpa Alta', zips:['12000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'0bd82f2d-e9fb-4f98-9a0e-13badad5e420', code:'09011',name:'Tláhuac', zips:['13000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'ce43b94a-3434-4a6d-884d-b97d88cca6d9', code:'09012',name:'Tlalpan', zips:['14000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'4b390846-ad62-4b9c-b8b9-9ab2c0489843', code:'09017',name:'Venustiano Carranza', zips:['15000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
+db.cities.insertOne({_id:'371b81d0-f3d3-496b-aca4-f95c8bd4a63f', code:'09013',name:'Xochimilco', zips:['16000'], _class:'com.sacnavi.diplomado.adoptpet.svc.domain.City'});
