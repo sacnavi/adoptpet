@@ -26,4 +26,4 @@ spec:
                    name: adoptpet-secrets
                    key: dbpassword
             - name: APP_DB_URL
-              value: mongodb://${APP_USER}:${APP_PASS}@adoptpet-db:27017/{APP_DB}?authSource=admin
+              value: mongodb://${APP_USER}:${APP_PASS}@adoptpet-db:27017/${APP_DB}?authSource=admin
