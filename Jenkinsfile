@@ -40,14 +40,14 @@ pipeline {
             steps {
                 sh './mvnw package -Dmaven.test.skip=true'
             }
-        }        
-    }
-
-   stage('Building image') {
+        }
+        
+        stage('Building image') {
           steps {
             sh 'sudo docker build -t ${DOCKER_IMAGE} .'
           }
         }
+        
         stage('Login & Push') {
           steps {
                 sh '''
@@ -55,7 +55,8 @@ pipeline {
                     sudo docker push ${DOCKER_IMAGE}
                 '''
           }
-        }
+        }        
+    }
  
     post {
         success {
