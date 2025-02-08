@@ -56,9 +56,7 @@ pipeline {
       steps {
         sh '''
         echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login - u $DOCKERHUB_CREDENTIALS_USR--password - stdin docker.io
-        sudo docker push $ {
-          DOCKER_IMAGE
-        }
+        sudo docker push $ {DOCKER_IMAGE}
         '''
       }
     }
