@@ -14,7 +14,7 @@ pipeline {
     stage('Cloning code') {
       steps {
         checkout([$class: 'GitSCM', branches: [
-          [name: '*/feat/jenkinsfile']
+          [name: '*/*']
         ], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [
           [credentialsId: 'ricp-git', url: 'https://github.com/sacnavi/adoptpet.git']
         ]])
@@ -54,14 +54,12 @@ pipeline {
 
     stage('Login & Push') {
       steps {
-        sh ''
-        '
+        sh '''
         echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login - u $DOCKERHUB_CREDENTIALS_USR--password - stdin docker.io
         sudo docker push $ {
           DOCKER_IMAGE
         }
-        ''
-        '
+        '''
       }
     }
   }
