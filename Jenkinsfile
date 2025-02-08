@@ -24,7 +24,7 @@ pipeline {
     stage('Checkout') {
       steps {
         checkout([$class: 'GitSCM', branches: [
-          [name: "*/${env.BRANCH_NAME}"]
+          [name: "*/feat/jenkinsfile"]
         ], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [
           [credentialsId: 'ricp-git', url: 'https://github.com/sacnavi/adoptpet.git']
         ]])
