@@ -1,5 +1,11 @@
 pipeline {
     agent any
+        
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('ricp-docker')
+        DOCKER_IMAGE = 'sacnavi/adoptpetsvc:v7'
+	}
+	
     tools {
         jdk 'JDK17'
     }
@@ -36,6 +42,20 @@ pipeline {
             }
         }        
     }
+
+   stage('Building image') {
+          steps {
+            sh 'sudo docker build -t ${DOCKER_IMAGE} .'
+          }
+        }
+        stage('Login & Push') {
+          steps {
+                sh '''
+                    echo $DOCKERHUB_CREDENTIALS_PSW | sudo docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin docker.io
+                    sudo docker push ${DOCKER_IMAGE}
+                '''
+          }
+        }
  
     post {
         success {
