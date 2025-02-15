@@ -1,0 +1,8 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  name: hello-world-run
+  namespace: diploe2-ricp
+spec:
+  taskRef:
+    name: hello-world
