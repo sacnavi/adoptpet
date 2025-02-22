@@ -16,6 +16,6 @@ spec:
   - name: deleteExisting
     value: "true"
   workspaces:
-    - name: directory
+    - name: output
       persistentVolumeClaim:
         claimName: workspace-ricp
