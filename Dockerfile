@@ -1,5 +1,5 @@
 ## use a java 17 image
-FROM openjdk:17-oracle
+FROM docker.io/openjdk:17-oracle
 
 LABEL maintainer="Ivan Castillo <sacnavi@outlook.com>"
 
