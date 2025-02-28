@@ -9,7 +9,6 @@ spec:
   params:
     - name: IMAGE
       value: 'docker.io/sacnavi/adoptpetsvc:v8'
-    # ej. value: 'docker.io/cafaray/notificaciones:V2.2'
     - name: TLSVERIFY
       value: 'false'
     - name: STORAGE_DRIVER
