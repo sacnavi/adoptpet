@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: git-clone-ricp-
+  namespace: diploe2-ricp
+spec:
+  taskRef:
+    kind: Task
+    name: git-clone
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  params:
+  - name: url
+    value: https://github.com/sacnavi/adoptpet.git
+  - name: deleteExisting
+    value: "true"
+  workspaces:
+    - name: output
+      persistentVolumeClaim:
+        claimName: workspace-ricp

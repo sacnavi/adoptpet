@@ -1,0 +1,15 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: list-directory-ricp-
+  namespace: diploe2-ricp
+spec:
+  taskRef:
+    name: list-directory
+  podTemplate:
+    securityContext:
+      fsGroup: 65532
+  workspaces:
+    - name: directory
+      persistentVolumeClaim:
+        claimName: workspace-ricp
