@@ -1,0 +1,21 @@
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: kubernetes-actions-ricp-
+  namespace: diploe2-ricp
+spec:
+  serviceAccountName: tekton-sa
+  taskRef:
+    name: kubernetes-actions
+  params:
+    - name: script
+      value: |
+        kubectl delete deployment adoptpetsvc
+        kubectl create deployment adoptpetsvc --image=docker.io/sacnavi/adoptpetsvc:v8
+        echo "----------"
+        kubectl get deployment
+  workspaces:
+    - name: kubeconfig-dir
+      emptyDir: {}
+    - name: manifest-dir
+      emptyDir: {}
