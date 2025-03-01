@@ -7,7 +7,7 @@ spec:
   params:
     - name: message
       type: string
-      default: "Hello World!"
+      default: 'Hello World!'
   steps:
     - name: echo
       image: busybox
