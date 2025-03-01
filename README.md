@@ -173,7 +173,7 @@ Please  use this structure while naming branches:
 - If this project lands at some management tool, considering including issue number in description used. 
 
 Tags should be also used to mark different versions of application.
-
+(Should build now)
 
 ## Want to learn more?
 ### Reference Documentation
