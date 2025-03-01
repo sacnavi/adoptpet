@@ -174,7 +174,7 @@ Please  use this structure while naming branches:
 
 Tags should be also used to mark different versions of application.
 
-A webhook and an event listener were set up, this project should be built now.
+A webhook and an event listener were set up, this project should be built now, some issues were solved.
 
 ## Want to learn more?
 ### Reference Documentation
