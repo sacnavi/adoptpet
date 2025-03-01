@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: task-echo
+  namespace: diploe2-ricp
+spec:
+  params:
+    - name: message
+      type: string
+      default: "Hello World!"
+  steps:
+    - name: echo
+      image: busybox
+      script: |
+        #!/bin/sh
+        echo $(params.message)
