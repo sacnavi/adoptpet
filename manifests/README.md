@@ -439,6 +439,104 @@ https://hub.docker.com/layers/sacnavi/adoptpetsvc/v8/images/sha256-182af8ef75fa3
 
 ![DockerHub updated with new tag](doc/img/buildha-registry.png "DockerHub tag")
 
+## Pipeline
+After all previous steps have completed, they can be integrated in a [***`Pipeline`***](
+https://tekton.dev/docs/pipelines/pipelines/) so they can be run as a single process either using a task runner or a trigger.
+
+Pipeline definition contains the list of tasks to perform and information (parameters and workspaces) they require.
+
+```yaml
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-ci # name that will be used by task runners or event listeners
+  namespace: <namespace-name>
+spec:
+  description: | # detailed description of the pipeline.
+    This pipeline fetches code from a repository, compiles and packages it and creates and
+    pushes the container image to image registry.
+  params:
+    - name: repo-url # this is required by git-clone task
+      type: string
+    - name: maven-image # required by maven task
+      type: string
+    - name: container-image # required by buildah task to indicate image name and tag to generate and push
+      type: string
+  workspaces:
+    - name: workspace # this is the general storage, will contain source code, dependencies, compiled code and image
+      # is used by all tasks that require storage (all tasks in this pipeline)
+    - name: maven-settings # this contains maven settings (servers, proxies, profiles, etc.)
+    - name: dockerconfig # this is used by buildah task to retrieve docker credentials
+  tasks: # list of tasks that pipeline will execute
+```
+
+Tasks used are the same already detailed above, there are a couple of changes made for pipeline:
+
+  - Since now they are within another process, it is necessary to establish execution order. This is achieved by using
+  a new field in task specification ***`runAfter`*** to indicate not only precedence between tasks but also preventing
+  to run before previous task finishes delivering output (which could be input for current task).
+  
+    ```yaml
+      - name: maven-build
+        taskRef:
+          name: maven
+        runAfter:
+          - fetch-code # task maven-build shall wait to fetch-code to finish
+    
+      - name: container-image
+        taskRef:
+          name: buildah
+        runAfter:
+          - maven-build # and container-image will wait for maven-build to finish  
+    ```
+  - This was not a requirement, but since pipelines are meant to run several times a day (for every push to a repo)
+  it might be convenient to keep all dependencies downloaded avoiding to do it each time. It might be necessary to 
+  clean it up periodically since some dependencies will become obsolete after some time.
+
+    ```yaml
+      - name: maven-local-repo
+        workspace: workspace # this is defined at workspaces section of pipeline and binded at runner definition
+    ```
+
+As mentioned above, there are different ways to run a pipeline: using a [***`PipelineRun`***](
+https://tekton.dev/docs/pipelines/pipelineruns/) (similar to task runners) or through Event Listeners and Triggers.
+
+PipelineRun references pipeline to run and parameters that are used by task in it or necessary workspaces' sources.
+
+```yaml
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: pipelinerun-ci-
+  namespace: <namespace-name>
+spec:
+  serviceAccountName: tekton-sa
+  pipelineRef:
+    name: pipeline-ci # this is the name of pipeline to run, must exist in namespace
+  params: # top level parameters definition, will be passed to pipeline and tasks will use from it
+    - name: repo-url
+      value: https://github.com/sacnavi/adoptpet.git
+    - name: maven-image
+      value: gcr.io/cloud-builders/mvn@sha256:8f38a2667125a8d83f6e1997847fedb6a06f041c90e2244884153d85d95f869b
+    - name: container-image
+      value: docker.io/sacnavi/adoptpetsvc:v9
+  workspaces: # workspaces used, source for each one is specified
+    - name: maven-settings
+      configmap: # workspaces can use a configmap, a persistent volume claim or a secret
+        name: maven-settings
+    - name: workspace
+      persistentVolumeClaim:
+        claimName: workspace-ricp
+    - name: dockerconfig
+      secret:
+        secretName: dockerconfig-secret
+```
+
+When a pipeline runs, a pod for every task is deployed and at the end, a summary can be shown so status for each
+task can be reviewed.
+
+![Pipeline result](doc/img/pipeline-result.png "Pipeline summary")
+
 ## Want to learn more?
 ### Reference Documentation
 For further reference, please consider the following sections:
