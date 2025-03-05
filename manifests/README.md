@@ -548,6 +548,6 @@ For further reference, please consider the following sections:
 
 ---
 
-To remove after tests
+Remove this after tests
 
 ---
