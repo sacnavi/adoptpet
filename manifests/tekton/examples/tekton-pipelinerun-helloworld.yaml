@@ -1,0 +1,17 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: pipelinerun-helloworld-
+  namespace: diploe2-ricp
+spec:
+  serviceAccountName: tekton-sa
+  pipelineRef:
+    name: pipeline-hello-world
+  params:
+    - name: your-name
+      value: 'Iván Castillo'
+    - name: repo-url
+      value: https://github.com/sacnavi/adoptpet.git
+  workspaces:
+    - name: empty-dir
+      emptyDir: {}

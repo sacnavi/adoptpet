@@ -1,0 +1,26 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  generateName: pipelinerun-ci-
+  namespace: diploe2-ricp
+spec:
+  serviceAccountName: tekton-sa
+  pipelineRef:
+    name: pipeline-ci
+  params:
+    - name: repo-url
+      value: https://github.com/sacnavi/adoptpet.git
+    - name: maven-image
+      value: gcr.io/cloud-builders/mvn@sha256:8f38a2667125a8d83f6e1997847fedb6a06f041c90e2244884153d85d95f869b
+    - name: container-image
+      value: docker.io/sacnavi/adoptpetsvc:v9
+  workspaces:
+    - name: maven-settings
+      configmap:
+        name: maven-settings
+    - name: workspace
+      persistentVolumeClaim:
+        claimName: workspace-ricp
+    - name: dockerconfig
+      secret:
+        secretName: dockerconfig-secret
