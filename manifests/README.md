@@ -544,10 +544,3 @@ For further reference, please consider the following sections:
 * [Tekton project](https://tekton.dev/)
 * [Tekton tasks repository](https://hub.tekton.dev/)
 * [YAML specification](https://yaml.org/)
-
-
----
-
-Remove after tests
-
----
