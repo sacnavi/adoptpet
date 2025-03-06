@@ -1,0 +1,6 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: adoptpetsvc-cm
+data: # should be replaced with actual value, it can not be stored on
+  APP_DB_URL: mongodb+srv://<user>:<password>@<server>/<database>

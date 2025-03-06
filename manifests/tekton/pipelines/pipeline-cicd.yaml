@@ -1,0 +1,92 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: pipeline-cicd
+  namespace: diploe2-ricp
+spec:
+  description: |
+    This pipeline runs full CI/CD cycle from fetching repository code, compile and package,
+    containerization, push to image registry and deployment to kubernetes cluster.
+  params:
+    - name: repo-url
+      type: string
+    - name: maven-image
+      type: string
+    - name: container-image
+      type: string
+    - name: deployment-name
+      type: string
+  workspaces:
+    - name: workspace
+    - name: maven-settings
+    - name: dockerconfig-secret
+    - name: empty-dir
+  tasks:
+    - name: fetch-code
+      taskRef:
+        kind: Task
+        name: git-clone
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: deleteExisting
+          value: 'true'
+      workspaces:
+        - name: output
+          workspace: workspace
+    - name: maven-build
+      taskRef:
+        name: maven
+      runAfter:
+        - fetch-code
+      params:
+        - name: GOALS
+          value:
+            - -B
+            - -DskipTests
+            - clean
+            - package
+        - name: MAVEN_IMAGE
+          value: $(params.maven-image)
+      workspaces:
+        - name: maven-settings
+          workspace: maven-settings
+        - name: source
+          workspace: workspace
+        - name: maven-local-repo
+          workspace: workspace
+    - name: container-image
+      taskRef:
+        name: buildah
+      runAfter:
+        - maven-build
+      params:
+        - name: IMAGE
+          value: $(params.container-image)
+        - name: TLSVERIFY
+          value: 'false'
+        - name: STORAGE_DRIVER
+          value: 'vfs'
+      workspaces:
+        - name: source
+          workspace: workspace
+        - name: dockerconfig
+          workspace: dockerconfig-secret
+    - name: deploy-app
+      taskRef:
+        name: kubernetes-actions
+      runAfter:
+        - container-image
+      params:
+        - name: script
+          value: |
+            kubectl delete deployment $(params.deployment-name)
+            kubectl create deployment $(params.deployment-name) --image=$(params.container-image)
+            kubectl set env --from=configmap/adoptpetsvc-cm deployment/$(params.deployment-name)
+            echo "----------"
+            kubectl get deployment
+      workspaces:
+        - name: kubeconfig-dir
+          workspace: empty-dir
+        - name: manifest-dir
+          workspace: empty-dir
