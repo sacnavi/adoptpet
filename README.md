@@ -12,9 +12,9 @@ Native Applications in Hybrid Environments*** course.
 ---
 It is a series of REST endpoints implementing a CRUD system for both Pets and Cities.
 
-![Available endpoints for Cities API](./resources/api-cities.png "OpenAPI Image")
+![Available endpoints for Cities API](_resources/api-cities.png "OpenAPI Image")
 
-![Available endpoints for Pets API](./resources/api-pets.png "OpenAPI Image")
+![Available endpoints for Pets API](_resources/api-pets.png "OpenAPI Image")
 
 It is built using Java Spring Boot and MongoDB.
 
@@ -173,8 +173,6 @@ Please  use this structure while naming branches:
 - If this project lands at some management tool, considering including issue number in description used. 
 
 Tags should be also used to mark different versions of application.
-
-A webhook and an event listener were set up, this project should be built now, some issues were solved.
 
 ## Want to learn more?
 ### Reference Documentation
