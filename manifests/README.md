@@ -269,12 +269,12 @@ logs can be now explored for this pod as well as output for execution.
   ```
 output for this execution is shown
 
-![Log for git clone task pod](./doc/img/git-clone-output.png "Git Clone Output")
+![Log for git clone task pod](../_resources/git-clone-output.png "Git Clone Output")
 
 Following image shows information of commit retrieved: `3d46564a16708b7d92d0ee7f91f440747f2addde` and date: `1739640079`
 which corresponds to **Feb 15, 2025 17:21:19** as well as repostitory cloned (this one).
 
-![Repository, last commit hash and date](./doc/img/git-clone-result.png "Git Clone Output")
+![Repository, last commit hash and date](../_resources/git-clone-result.png "Git Clone Output")
 
 #### Directory listing
 It is not part of the process, but as a way of validation a [***`list-directory`***](
@@ -312,7 +312,7 @@ and pod log should show files downloaded, only those at root directory, verifyin
     kubectl logs list-directory-ricp-xqr2m-pod -n diploe2-ricp
   ```
 
-![List of files pulled from repository](./doc/img/list-dir-output.png "List Directory Output")
+![List of files pulled from repository](../_resources/list-dir-output.png "List Directory Output")
 
 ### Build artifact
 Once files are available within the cluster (in the persistent volume), it is possible to generate the artifact
@@ -369,14 +369,14 @@ and by displaying logs output of mvn command is shown
     kubectl -n diploe2-ricp logs maven-ricp-dzh5k-pod -c step-mvn-goals
   ```
 
-![Maven execution, downloading dependencies](doc/img/mvn-output.png "Maven task output")
+![Maven execution, downloading dependencies](../_resources/mvn-output.png "Maven task output")
 
 all dependencies are downloaded, another workspace could be created to store local repository and avoid this process
 in subsequent executions.
 
 at the end, artifact generated and a BUILD SUCCESS message indicate that jar file is now available.
 
-![Maven successful execution message](doc/img/mvn-success.png "Maven task output")
+![Maven successful execution message](../_resources/mvn-success.png "Maven task output")
 
 This jar file is executable directly using a suitable JRE, but it is not yet ready for a kubernetes deployment,
 a Docker image will be created and pushed to Docker Hub so it is available to deploy to the cluster.
@@ -427,17 +427,17 @@ reviewing logs:
     kubectl logs buildah-ricp-dvdcd-pod 
   ```
 
-![Docker image build process](doc/img/buildha-output.png "Buildha output")
+![Docker image build process](../_resources/buildha-output.png "Buildha output")
 
 image created and tagged, digest `182af8ef75fa3d2cb4fcfcd097e460dbc205d7d870dcc68b64cc3826b6b7fe79` generated,
 and pushed to registry
 
-![Image successfully built, tagged and pushed](doc/img/buildha-success.png "Buildha output")
+![Image successfully built, tagged and pushed](../_resources/buildha-success.png "Buildha output")
 
 this information can be verified on DockerHub site at [sacnavi/adoptpetsvc:v8](
 https://hub.docker.com/layers/sacnavi/adoptpetsvc/v8/images/sha256-182af8ef75fa3d2cb4fcfcd097e460dbc205d7d870dcc68b64cc3826b6b7fe79)
 
-![DockerHub updated with new tag](doc/img/buildha-registry.png "DockerHub tag")
+![DockerHub updated with new tag](../_resources/buildha-registry.png "DockerHub tag")
 
 ## Pipeline
 After all previous steps have completed, they can be integrated in a [***`Pipeline`***](
@@ -535,7 +535,7 @@ spec:
 When a pipeline runs, a pod for every task is deployed and at the end, a summary can be shown so status for each
 task can be reviewed.
 
-![Pipeline result](doc/img/pipeline-result.png "Pipeline summary")
+![Pipeline result](../_resources/pipeline-result.png "Pipeline summary")
 
 ## Want to learn more?
 ### Reference Documentation
