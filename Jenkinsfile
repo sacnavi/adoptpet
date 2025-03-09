@@ -38,18 +38,6 @@ pipeline {
         sh 'ls -la'
       }
     }
-    /*
-            stage('Test') {
-                steps {
-                    sh './mvnw test'
-                }
-                post {
-                    always {
-                        junit 'target/surefire-reports/*.xml' // Informar resultados de JUnit
-                    }
-                }
-            }
-    */
     stage('Package') {
       steps {
         sh './mvnw package -Dmaven.test.skip=true'
