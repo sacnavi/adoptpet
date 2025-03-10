@@ -8,7 +8,7 @@ During the course this project was developed for, several tools and platforms ha
 For continuous integration stages, Tekton framework tasks were installed and run on a Kubernetes cluster.
 
 # Continuous Integration
-It is necessary to integrate changes to code as soon as possible, to validate that they are correct and 
+It is necessary to integrate changes to code as soon as possible, to validate that they are correct and
 code can be compiled and tested and to be able to build all artifacts.
 
 In order to achieve it, a pipeline should be created to perform a series of tasks to complete all steps.
@@ -17,8 +17,8 @@ In order to achieve it, a pipeline should be created to perform a series of task
 There are some activities to perform so cluster gets ready to start working and as part of the actual process.
 
 ### Prepare cluster
-First step is to create an account with privileges to handle tasks and runners, get persistent volumes 
-and secrets or config maps available. 
+First step is to create an account with privileges to handle tasks and runners, get persistent volumes
+and secrets or config maps available.
 
 For these exercises, a cluster was set up and client configured so we could work on it,
 [***namespaces***](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/) were also created
@@ -91,7 +91,7 @@ rules:
   verbs: ["get", "list", "watch", "create", "update", "delete"]
 ```
 
-Once role and service account are created, it is necessary to associate them so cluster knows that account is granted 
+Once role and service account are created, it is necessary to associate them so cluster knows that account is granted
 those privileges.
 [***Role binding***](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#kubectl-create-rolebinding)
 should be applied as listed below.
@@ -117,7 +117,7 @@ A persistent volume ([***PV***](https://kubernetes.io/docs/concepts/storage/pers
 is a piece of storage in the cluster that has been provisioned by an administrator or dynamically.
 A persistent volume claim (PVC) is a request for that storage by a user.
 
-This process will require resources to store source code, compiled code and docker images, so a PVC should be created 
+This process will require resources to store source code, compiled code and docker images, so a PVC should be created
 so generated pods can use it.
 
 ```yaml
@@ -146,7 +146,7 @@ This project is built and run using Apache Maven, maven task detailed later need
 where value is the content of `settings.xml` file, empty sections are shown here, but in real projects different
 servers (nexus, jfrog, etc.), proxies, profiles and so on, should be informed instead.
 
-It can be generated using: 
+It can be generated using:
 
 ```yaml
 apiVersion: v1
@@ -199,7 +199,7 @@ Next step is to retrieve code from version control repository, for current proje
 
 [***`git-clone`***](https://hub.tekton.dev/tekton/task/git-clone) task must be available in the namespace the project
 is being cloned into, there are different approaches for doing this, all executions used second one.
-    
+
 - Download task specification into a local YAML file and then apply into cluster.
   ```shell
     curl https://api.hub.tekton.dev/v1/resource/tekton/task/git-clone/0.9/raw > git-clone-task.yaml
@@ -260,7 +260,7 @@ output for this command shows the name of task created, which is also prefix for
 
 `taskrun.tekton.dev/list-clone-d4rds created`
 
-pods can be listed to check a new pod was created and running, also `-pod` suffix can be added to taskrun name.  
+pods can be listed to check a new pod was created and running, also `-pod` suffix can be added to taskrun name.
 
 logs can be now explored for this pod as well as output for execution.
 
@@ -382,7 +382,7 @@ This jar file is executable directly using a suitable JRE, but it is not yet rea
 a Docker image will be created and pushed to Docker Hub so it is available to deploy to the cluster.
 
 ### Build and push Docker Image
-It is time to pack this artifact as a container image, this is achieved through Dockerfile at top directory of this 
+It is time to pack this artifact as a container image, this is achieved through Dockerfile at top directory of this
 project, and push it to image registry, DockerHub in this case.
 
 Another task, [***`buildha`***](https://hub.tekton.dev/tekton/task/buildah), has to be installed and a new task run
@@ -421,7 +421,7 @@ output is, once again, name of task created
 
 `taskrun.tekton.dev/buildah-ricp-dvdcd created`
 
-reviewing logs: 
+reviewing logs:
 
   ```shell
     kubectl logs buildah-ricp-dvdcd-pod 
@@ -439,7 +439,59 @@ https://hub.docker.com/layers/sacnavi/adoptpetsvc/v8/images/sha256-182af8ef75fa3
 
 ![DockerHub updated with new tag](../_resources/buildha-registry.png "DockerHub tag")
 
-## Pipeline
+# Continuous Deployment
+As discussed, it is important to integrate changes and build artifacts periodically, but it is also to make them
+available so they can be used and tested in actual environments.
+
+### Application deployment
+Deploying the app requires to instantiate applications and services (such as databases) as containers in the cluster.
+
+For this step, a new task ([***`kubernetes-actions`***](https://hub.tekton.dev/tekton/task/kubernetes-actions))
+is needed to perform a set of commands as shown below.
+
+```yaml
+apiVersion: tekton.dev/v1beta1
+kind: TaskRun
+metadata:
+  generateName: kubernetes-actions-
+  namespace: <namespace-name>
+spec:
+  serviceAccountName: tekton-sa
+  taskRef:
+    name: kubernetes-actions
+  params:
+    - name: script
+      value: | # this is the set of commands to run by task
+        kubectl delete deployment adoptpetsvc # removes previously deployed version 
+        kubectl create deployment adoptpetsvc --image=<full-image-url> # creates new version using specified version  
+        kubectl set env --from=configmap/adoptpetsvc-cm deployment/adoptpetsvc # add necessary environment variable from
+        # a config map, in this case it is the url of the database service the app will run against
+        echo "----------" # displays a message
+        kubectl get deployment # shows all active deployments.
+  workspaces:
+    - name: kubeconfig-dir # stores a config file that allows to use a different cluster for these commands
+      emptyDir: {} # as it is not used, an empty directory is defined here
+    - name: manifest-dir # same for manifest files 
+      emptyDir: {} # again it is not used, so empty directory defined
+```
+
+By exploring logs for pod created, output should look like next image.
+```text
+Defaulted container "step-kubectl" out of: step-kubectl, prepare (init), place-scripts (init)
+deployment.apps "adoptpetsvc" deleted
+deployment.apps/adoptpetsvc created
+deployment.apps/adoptpetsvc env updated
+----------
+NAME                     READY   UP-TO-DATE   AVAILABLE   AGE
+el-event-listener-cicd   1/1     1            1           4d11h
+adoptpetsvc              0/1     1            0           0s
+
+```
+
+The goal now is to perform all these tasks as a single process that can be run automatically (it can be also a manual
+process) so every change is included immediately after pushed to repository,
+
+### Pipeline
 After all previous steps have completed, they can be integrated in a [***`Pipeline`***](
 https://tekton.dev/docs/pipelines/pipelines/) so they can be run as a single process either using a task runner or a trigger.
 
@@ -449,12 +501,12 @@ Pipeline definition contains the list of tasks to perform and information (param
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: pipeline-ci # name that will be used by task runners or event listeners
+  name: pipeline-cicd # name that will be used by task runners or event listeners
   namespace: <namespace-name>
 spec:
   description: | # detailed description of the pipeline.
-    This pipeline fetches code from a repository, compiles and packages it and creates and
-    pushes the container image to image registry.
+    This pipeline runs full CI/CD cycle from fetching repository code, compile and package,
+    containerization, push to image registry and deployment to kubernetes cluster.
   params:
     - name: repo-url # this is required by git-clone task
       type: string
@@ -462,41 +514,50 @@ spec:
       type: string
     - name: container-image # required by buildah task to indicate image name and tag to generate and push
       type: string
+    - name: deployment-name # name of the object use to deploy, it is used to erase and create deployments
+      type: string
   workspaces:
     - name: workspace # this is the general storage, will contain source code, dependencies, compiled code and image
       # is used by all tasks that require storage (all tasks in this pipeline)
     - name: maven-settings # this contains maven settings (servers, proxies, profiles, etc.)
     - name: dockerconfig # this is used by buildah task to retrieve docker credentials
   tasks: # list of tasks that pipeline will execute
+    - name: empty-dir # for some tasks there is no need to store/retrieve information so empty directories are declared
 ```
 
 Tasks used are the same already detailed above, there are a couple of changes made for pipeline:
 
-  - Since now they are within another process, it is necessary to establish execution order. This is achieved by using
+- Since now they are within another process, it is necessary to establish execution order. This is achieved by using
   a new field in task specification ***`runAfter`*** to indicate not only precedence between tasks but also preventing
   to run before previous task finishes delivering output (which could be input for current task).
+
+  ```yaml
+    - name: maven-build
+      taskRef:
+        name: maven
+      runAfter:
+        - fetch-code # task maven-build shall wait to fetch-code to finish
   
-    ```yaml
-      - name: maven-build
-        taskRef:
-          name: maven
-        runAfter:
-          - fetch-code # task maven-build shall wait to fetch-code to finish
-    
-      - name: container-image
-        taskRef:
-          name: buildah
-        runAfter:
-          - maven-build # and container-image will wait for maven-build to finish  
-    ```
-  - This was not a requirement, but since pipelines are meant to run several times a day (for every push to a repo)
-  it might be convenient to keep all dependencies downloaded avoiding to do it each time. It might be necessary to 
+    - name: container-image
+      taskRef:
+        name: buildah
+      runAfter:
+        - maven-build # container-image will wait for maven-build to finish
+  
+    - name: deploy-app
+      taskRef:
+        name: kubernetes-actions
+      runAfter:
+        - container-image # image must be deployed to registry before it is used to deploy service 
+  ```
+- This was not a requirement, but since pipelines are meant to run several times a day (for every push to a repo)
+  it might be convenient to keep all dependencies downloaded avoiding doing it each time. It might be necessary to
   clean it up periodically since some dependencies will become obsolete after some time.
 
-    ```yaml
-      - name: maven-local-repo
-        workspace: workspace # this is defined at workspaces section of pipeline and binded at runner definition
-    ```
+  ```yaml
+    - name: maven-local-repo
+      workspace: workspace # this is defined at workspaces section of pipeline and binded at runner definition
+  ```
 
 As mentioned above, there are different ways to run a pipeline: using a [***`PipelineRun`***](
 https://tekton.dev/docs/pipelines/pipelineruns/) (similar to task runners) or through Event Listeners and Triggers.
@@ -507,12 +568,12 @@ PipelineRun references pipeline to run and parameters that are used by task in i
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: pipelinerun-ci-
+  generateName: pipelinerun-cicd-
   namespace: <namespace-name>
 spec:
   serviceAccountName: tekton-sa
   pipelineRef:
-    name: pipeline-ci # this is the name of pipeline to run, must exist in namespace
+    name: pipeline-cicd # this is the name of pipeline to run, must exist in namespace
   params: # top level parameters definition, will be passed to pipeline and tasks will use from it
     - name: repo-url
       value: https://github.com/sacnavi/adoptpet.git
@@ -537,9 +598,149 @@ task can be reviewed.
 
 ![Pipeline result](../_resources/pipeline-result.png "Pipeline summary")
 
+## Running pipeline on every push to repository
+As mentioned above, pipeline has to be run every time new code is added to repository so it goes through the whole
+process to deployment.
+
+This means we need to link source control repository and cluster running pipeline and tasks.
+
+### Trigger
+A [***`TriggerTemplate`***](https://tekton.dev/docs/triggers/triggertemplates/) specifies a blueprint for the object
+to instantiate/execute.
+
+```yaml
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerTemplate
+metadata:
+  name: tekton-trigger-template-cicd # name for the resource
+  namespace: <namespace-name>
+spec:
+  params: # list of parameters made available by the template, can be passed to underlying resource
+    - name: <parameter-name>
+      description: <parameter-description>
+  resourcetemplates: # resource to fire
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun # type of resource to fire, could also be a taskrun
+      metadata:
+        generateName: pipelinerun-cicd-
+      spec:
+        serviceAccountName: tekton-sa
+        pipelineRef:
+          name: pipeline-cicd # name of the associated pipeline
+        params:
+          - name: <parameter-name-in-pipeline> # see repo-url in PipelineRun definition at previous section
+            value: $(tt.params.<parameter-name>) # this name is one of listed above, in TriggerTemplate->spec->params
+        workspaces: # list of workspaces to be used in pipeline and source for everyone (pvc, secret, configmap, etc.)
+          - name: <workspace-name> # this is how workspace is referenced
+            <source-type>: # persistent volume claim, secret, config map or empty directory
+              name: <source-name> # reference of source within namespace, should exist and contain necessary information
+```
+Up to this point, pipeline can be run through described template, now it is necessary to provide values for all 
+defined parameters in it.
+
+A [***`TriggerBinding`***](https://tekton.dev/docs/triggers/triggerbindings/) allows fields extraction from an event 
+payload and bind them to named parameters that can then be used in a TriggerTemplate. 
+
+Trigger uses the parameter name to match TriggerBinding params to TriggerTemplate params. In order to pass information,
+the param name used in the binding must match the param name used in the template.
+```yaml
+apiVersion: triggers.tekton.dev/v1alpha1
+kind: TriggerBinding
+metadata:
+  name: tekton-trigger-binding-cicd
+  namespace: <namespace-name>
+spec:
+  params: # list of parameters to bind, values can be literal or a variable coming from some event
+    - name: repo-url # as mentioned, this name must match exactly the name defined in template to be properly bound
+      value: $(body.repository.clone_url) # this name must match some value from event listener payload, see below
+```
+A source of this information is now needed so pipeline can be run with proper values.
+
+For this project a GitHub Webhook is used, so now it is necessary to add a mechanism that catches these requests and
+starts processing incoming data and passing them to pipeline through templates.
+
+### Event listener
+A [***`ClusterInterceptor`***](https://tekton.dev/docs/triggers/clusterinterceptors/) specifies an external Kubernetes 
+service running custom business logic that receives the event payload from the EventListener via an HTTP request and
+returns a processed version of the payload along with an HTTP 200 response.
+
+The ClusterInterceptor can also halt processing if the event payload does not meet criteria you have configured as well
+as add extra fields that are accessible in the EventListener's top-level extensions field to other Interceptors and
+ClusterInterceptors chained with it and the associated TriggerBinding.
+
+Interceptors can be defined either as a single resource, so can be reused across different event listeners, or inline
+within event listener definition, this second approach is used for this example.
+
+An [***`EventListener`***](https://tekton.dev/docs/triggers/eventlisteners/) is a Kubernetes object that listens for 
+events at a specified port on a Kubernetes cluster.
+
+It exposes an addressable sink that receives incoming event and specifies one or more Triggers. The sink is a Kubernetes
+service running the sink logic inside a dedicated Pod.
+
+```yaml
+apiVersion: triggers.tekton.dev/v1beta1
+kind: EventListener
+metadata:
+  name: event-listener-cicd
+  namespace: <namespace-name>
+spec:
+  serviceAccountName: tekton-triggers-sa # service account granted with privileges to handle several
+  # resources in triggers.tekton.dev apiGroup, configurations is beyond this document's scope
+  triggers:
+    - name: github-listener
+      interceptors: # interceptors defined for this event listener
+        - ref:
+            name: "github"
+            kind: ClusterInterceptor
+            apiVersion: triggers.tekton.dev
+          params:
+            - name: "eventTypes"
+              value: ["push"] # will only process pushes to repository, ignoring any other type 
+      bindings:
+        - ref: tekton-trigger-binding-cicd # this is the name of binding defined above
+      template:
+        ref: tekton-trigger-template-cicd # this is the template to bind to events 
+```
+As this pod and service are running within the cluster, it is still necessary to expose an endpoint on internet so
+GitHub webhook can reach to it and send event information.
+
+An [***`Ingress`***](https://kubernetes.io/docs/concepts/services-networking/ingress/) exposes HTTP and HTTPS routes
+from outside the cluster to services within the cluster. Traffic routing is controlled by rules defined on the Ingress
+resource.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-el
+  namespace: <namespace-name>
+  annotations:
+    # Specifies the entry points for the Traefik router, tells Traefik to use the 'web' entry point for this Ingress.
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  rules:
+    - host: el-event-listener-cicd.example.com # this is the url exposed by the cluster
+      http:
+        paths:
+          - path: /path-on-url # maps to specific resource so several services can be accessed through same host 
+            pathType: Prefix
+            backend:
+              service:
+                name: el-event-listener-cicd
+                port:
+                  number: 8080
+```
+Once all these resources are configured and running, a webhook shall be created on GitHub repository to send information
+to `el-event-listener-cicd.example.com/path-on-url`, setup is beyond scope of this documentation, please see
+[Webhooks Guide](https://docs.github.com/en/webhooks) for detailed information.
+
+Following image shows how all these resources are logically connected, including names defined in previous snippets.
+
+![Workflow from GitHub to Event listener to trigger to Pipeline](../_resources/git-to-pipeline.png "Event workflow")
+
 ## Want to learn more?
 ### Reference Documentation
-For further reference, please consider the following sections:
+For further reference, please consider the following sections, inline links were also provided as part of contents in
+this document.
 
 * [Tekton project](https://tekton.dev/)
 * [Tekton tasks repository](https://hub.tekton.dev/)
